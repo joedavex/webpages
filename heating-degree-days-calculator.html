@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heating Degree Days Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #f39c12;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-label {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .result-details {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .data-note {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+
+        .data-note a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .data-note a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌡️ Heating Degree Days</h1>
+        <p class="subtitle">New Milford, CT (65°F Base)</p>
+
+        <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" min="2025-01-01" max="2025-12-31" value="2025-01-22">
+        </div>
+
+        <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" min="2025-01-01" max="2025-12-31" value="2025-03-04">
+        </div>
+
+        <button onclick="calculateHDD()">Calculate</button>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <div class="result-value" id="totalHDD">0</div>
+            <div class="result-label">Total Heating Degree Days</div>
+            <div class="result-details" id="resultDetails"></div>
+        </div>
+
+        <div class="data-note">
+            Data source: <a href="https://www.newmilfordctweather.com/wxdegreedetail.php?year=2025" target="_blank">New Milford CT Weather</a><br>
+            Available data: January 1, 2025 - December 31, 2025
+        </div>
+    </div>
+
+    <script>
+        // Heating Degree Days data for 2025 from New Milford CT Weather
+        const hddData = {
+            1: [24.7, 29.9, 34.3, 37.2, 37.0, 41.2, 42.2, 42.6, 40.2, 34.8, 35.9, 34.1, 34.3, 39.8, 42.3, 42.1, 39.1, 32.9, 34.4, 48.1, 55.8, 57.9, 50.2, 47.9, 46.8, 40.0, 38.1, 35.3, 32.1, 40.5, 33.3],
+            2: [38.8, 45.5, 33.1, 31.5, 41.4, 37.4, 34.1, 38.3, 35.6, 39.2, 41.9, 34.1, 30.3, 36.5, 39.4, 32.7, 39.8, 46.8, 46.0, 44.9, 42.1, 41.4, 32.1, 29.2, 27.2, 25.4, 27.2, 27.9],
+            3: [27.2, 43.0, 41.1, 31.8, 22.3, 21.6, 29.0, 31.6, 30.7, 23.2, 20.7, 22.3, 23.0, 21.0, 21.6, 12.8, 17.1, 24.1, 19.0, 18.4, 24.7, 23.1, 30.5, 26.0, 21.2, 27.5, 29.2, 20.5, 14.1, 23.3, 12.2],
+            4: [22.5, 26.1, 14.3, 6.4, 19.9, 19.0, 24.9, 28.2, 29.9, 26.3, 23.3, 27.8, 21.4, 14.7, 11.7, 21.6, 18.8, 14.5, 0.7, 8.2, 16.2, 5.4, 5.9, 4.4, 0.9, 4.0, 16.3, 9.3, 3.6, 3.2],
+            5: [7.9, 2.9, 0.0, 1.3, 5.3, 4.7, 4.9, 4.4, 10.8, 10.0, 9.3, 7.7, 3.4, 4.2, 0.1, 0.0, 0.0, 4.0, 8.7, 11.6, 14.3, 18.5, 16.4, 13.5, 11.1, 6.3, 4.8, 4.9, 5.8, 2.3, 7.4],
+            6: [11.2, 7.4, 3.6, 0.0, 0.0, 0.0, 0.0, 0.0, 2.9, 0.4, 0.0, 0.0, 0.0, 4.0, 2.0, 1.8, 2.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            7: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            8: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 3.3, 3.1, 0.7, 0.0, 0.0, 0.0, 0.0, 1.9, 3.1, 0.4, 4.3, 2.3],
+            9: [1.9, 0.9, 1.6, 0.0, 0.0, 0.0, 2.1, 7.6, 6.5, 2.1, 2.5, 1.7, 0.0, 0.0, 0.0, 0.6, 1.5, 0.0, 0.0, 6.2, 8.5, 6.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0],
+            10: [7.1, 12.9, 10.6, 0.7, 1.0, 0.1, 0.0, 4.4, 16.3, 19.9, 9.8, 9.1, 12.4, 10.4, 10.0, 17.7, 15.9, 15.4, 9.3, 6.6, 11.9, 10.8, 15.7, 18.3, 20.3, 19.9, 23.8, 21.7, 18.1, 14.1, 13.5],
+            11: [17.6, 23.6, 20.2, 19.9, 19.6, 21.4, 22.8, 15.0, 13.5, 19.1, 31.2, 25.6, 23.5, 27.1, 28.0, 23.5, 27.2, 28.3, 30.3, 31.7, 27.8, 25.3, 32.1, 26.8, 24.7, 13.6, 25.4, 29.0, 32.1, 29.5],
+            12: [32.1, 34.7, 34.6, 36.4, 44.7, 34.8, 35.4, 42.9, 45.8, 32.9, 36.1, 39.7, 38.6, 40.1, 46.1, 40.4, 34.4, 32.3, 22.3, 34.7, 32.6, 37.3, 32.8, 30.8, 34.4, 45.3, 42.3, 42.2, 31.1, 39.2, 40.6]
+        };
+
+        function parseDate(dateStr) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return { year, month, day };
+        }
+
+        function calculateHDD() {
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
+            const errorEl = document.getElementById('error');
+            const resultEl = document.getElementById('result');
+
+            errorEl.classList.remove('show');
+            resultEl.classList.remove('show');
+
+            if (!startDateStr || !endDateStr) {
+                errorEl.textContent = 'Please select both start and end dates.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            const startDate = parseDate(startDateStr);
+            const endDate = parseDate(endDateStr);
+
+            if (startDate.year !== 2025 || endDate.year !== 2025) {
+                errorEl.textContent = 'Only 2025 data is available.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            const start = new Date(startDateStr);
+            const end = new Date(endDateStr);
+
+            if (start > end) {
+                errorEl.textContent = 'Start date must be before or equal to end date.';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            let totalHDD = 0;
+            let dayCount = 0;
+            let currentDate = new Date(start);
+
+            while (currentDate <= end) {
+                const month = currentDate.getMonth() + 1;
+                const day = currentDate.getDate();
+                
+                if (hddData[month] && hddData[month][day - 1] !== undefined) {
+                    totalHDD += hddData[month][day - 1];
+                    dayCount++;
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            document.getElementById('totalHDD').textContent = totalHDD.toFixed(1);
+            document.getElementById('resultDetails').textContent = 
+                `${dayCount} days from ${formatDate(startDateStr)} to ${formatDate(endDateStr)}`;
+            resultEl.classList.add('show');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // Set default dates
+        document.getElementById('startDate').value = '2025-01-22';
+        document.getElementById('endDate').value = '2025-03-04';
+    </script>
+</body>
+</html>
